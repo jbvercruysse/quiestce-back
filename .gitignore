@@ -1,0 +1,8 @@
+results
+results/*
+*.pdf
+results/*.pdf
+uploads
+uploads/*
+*.pyc
+.idea

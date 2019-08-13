@@ -27,7 +27,8 @@ def whoswho_data():
     check_file_input(request.files)
 
     # key for this run
-    key = str(time.time()) + "-" + str(randint(1, 999))
+    #key = str(time.time()) + "-" + str(randint(1, 999))
+    key = str(randint(1, 999))
 
     pdf = FPDF('P', 'mm', 'A4')
     pdf.set_font("Arial", size=11)
@@ -39,10 +40,12 @@ def whoswho_data():
     d = DrawCards(pdf, request.files, request.form)
     pdf = d.generate_page_recto()
 
-    result_pdf_path = config.RESULT_DIRECTORY + "final_" + key + ".pdf"
+    result_pdf_name =  "final_" + key + ".pdf"
+    result_pdf_path = config.RESULT_DIRECTORY + result_pdf_name
+
     pdf.output(result_pdf_path)
 
-    response = make_response(result_pdf_path)
+    response = make_response(config.RESULT_WEB_ROOT+result_pdf_name)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 

@@ -99,4 +99,4 @@ default_handler.setFormatter(formatter)
 #mail_handler.setFormatter(formatter)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

@@ -1,5 +1,7 @@
 from flask import Flask
-from flask import request, abort, logging, jsonify,make_response, redirect
+from flask import abort, logging, jsonify,make_response, redirect
+from flask import has_request_context, request
+from flask.logging import default_handler
 from pprint import pprint
 from TableCards import TableCards
 from DrawCards import DrawCards
@@ -58,6 +60,7 @@ def check_file_input(files):
 
 def check_filename_exist(filename):
     if filename== "":
+        app.logger.info('The filename is empty')
         return False
     else:
         return  True
@@ -74,7 +77,26 @@ def allowed_extension(filename):
     if ext.upper() in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
         return True
     else:
+        app.logger.info('That file extension is not allowed %s', ext)
         return False
+
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+
+        return super().format(record)
+
+formatter = RequestFormatter(
+    '[%(asctime)s] %(remote_addr)s requested %(url)s\n'
+    '%(levelname)s in %(module)s: %(message)s'
+)
+default_handler.setFormatter(formatter)
+#mail_handler.setFormatter(formatter)
 
 if __name__ == '__main__':
     app.run()

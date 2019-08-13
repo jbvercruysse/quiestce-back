@@ -6,3 +6,4 @@ uploads
 uploads/*
 *.pyc
 .idea
+config.py

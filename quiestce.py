@@ -23,6 +23,7 @@ def hello_world():
 
 @app.route('/whoswho-data', methods=['POST'])
 def whoswho_data():
+    app.logger.info('Starting new request....')
     #check_file_input(request.files)
 
     # key for this run
@@ -45,6 +46,7 @@ def whoswho_data():
 
     response = make_response(config.RESULT_WEB_ROOT+result_pdf_name)
     response.headers.add('Access-Control-Allow-Origin', '*')
+    app.logger.info('Done for new request....')
     return response
 
 def check_file_input(files):

@@ -1,7 +1,7 @@
 from fpdf import FPDF
 from pprint import pprint
 import os
-from math import ceil
+from math import floor
 import  config
 
 class TableCards:
@@ -13,10 +13,11 @@ class TableCards:
     # image height:20mm
     # image width: 25mm
     # text height:7mm
-    def __init__(self, pdf ,files, names):
+    def __init__(self, pdf ,files, names,key):
         self.pdf = pdf
         self.files = files
         self.names = names
+        self.key = key
         self.card_height = 35
         self.card_width = 32
         self.image_width = 26
@@ -56,20 +57,27 @@ class TableCards:
             # Split the extension from the filename
             ext = image.filename.rsplit(".", 1)[1]
 
-            current_image_name = 'test-'+str(index_current_card)+'.'+ext
+            current_image_name = self.key+"-"+str(index_current_card)+'.'+ext
             image_storage_path = os.path.join(config.IMAGE_DIRECTORY, current_image_name)
             image.save(image_storage_path)
         else: #use default
             image_storage_path = config.DEFAULT_IMAGE_PATH
         return image_storage_path
 
-    def generate_card_recto(self, my_image, my_text,index_current_card):
-        shift_x = (index_current_card%self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
-        #shift_y means a new line, we set 5 card by ine
-        shift_y = ceil(index_current_card/self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+    def define_recto_shift_x(self,index_current_card):
+        shift_x = (index_current_card % self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
+        return shift_x
 
+    def define_recto_shift_y(self,index_current_card):
+        # shift_y means a new line, we set 5 card by ine
+        shift_y = floor(index_current_card / self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+        return shift_y
+
+    def generate_card_recto(self, my_image, my_text,index_current_card):
+        shift_x= self.define_recto_shift_x(index_current_card)
+        shift_y = self.define_recto_shift_y(index_current_card)
         #set x and y
-        self.pdf.set_xy(config.PAGE_MARGIN + shift_x,config.PAGE_MARGIN + shift_y)
+        self.pdf.set_xy(config.PAGE_MARGIN + shift_x, config.PAGE_MARGIN + shift_y)
 
         #set card background
         self.pdf.set_fill_color(r=22, g=29, b=67)
@@ -116,14 +124,19 @@ class TableCards:
             index_current_card = index_current_card + 1
         return self.pdf
 
-
-    def generate_card_verso(self,index_current_card):
+    def define_verso_shift_x(self,index_current_card):
         #shift_x_for_verso is need for printer verso on large side
         shift_x_for_verso = 210 - (2*config.PAGE_MARGIN +self.nb_cards_by_line*self.card_width + (self.nb_cards_by_line-1)*self.blank_between_cards)
-
         shift_x = shift_x_for_verso + (index_current_card%self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
-        #shift_y means a new line, we set 5 card by ine
-        shift_y = ceil(index_current_card/self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+        return shift_x
+
+    def define_verso_shift_y(self, index_current_card):
+        # shift_y means a new line, we set 5 card by ine
+        return floor(index_current_card / self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+
+    def generate_card_verso(self,index_current_card):
+        shift_x = self.define_verso_shift_x(index_current_card)
+        shift_y = self.define_verso_shift_y(index_current_card)
 
         #set x and y
         self.pdf.set_xy(config.PAGE_MARGIN + shift_x,config.PAGE_MARGIN + shift_y)

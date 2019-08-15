@@ -23,23 +23,19 @@ def hello_world():
 
 @app.route('/whoswho-data', methods=['POST'])
 def whoswho_data():
-    pprint(request.form)
-    pprint(request.files)
-
-    check_file_input(request.files)
+    #check_file_input(request.files)
 
     # key for this run
-    #key = str(time.time()) + "-" + str(randint(1, 999))
-    key = str(randint(1, 999))
+    key = str(int(time.time())) + "-" + str(randint(1, 999))
 
     pdf = FPDF('P', 'mm', 'A4')
     pdf.set_font("Arial", size=11)
 
-    t = TableCards(pdf, request.files, request.form)
+    t = TableCards(pdf, request.files, request.form,key)
     t.generate_page_recto()
     pdf = t.generate_page_verso()
 
-    d = DrawCards(pdf, request.files, request.form)
+    d = DrawCards(pdf, request.files, request.form,key)
     pdf = d.generate_page_recto()
 
     result_pdf_name =  "final_" + key + ".pdf"

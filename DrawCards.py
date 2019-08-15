@@ -1,7 +1,7 @@
 from fpdf import FPDF
 from pprint import pprint
 import os
-from math import ceil
+from math import floor
 import  config
 
 class DrawCards:
@@ -12,10 +12,11 @@ class DrawCards:
     #image height: 41mm
     #text height : 15mm
 
-    def __init__(self, pdf, files, names):
+    def __init__(self, pdf, files, names,key):
         self.pdf = pdf
         self.files=files
         self.names = names
+        self.key = key
         self.card_width = 45
         self.card_height = 76
         self.card_padding = 3
@@ -51,10 +52,16 @@ class DrawCards:
 
         return self.pdf
 
+    def define_recto_shift_x(self,index_current_card):
+        return (index_current_card % self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
+
+    def define_recto_shift_y(self,index_current_card):
+        # shift_y means a new line, we set 5 card by ine
+        return floor((index_current_card % 12) / self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+
     def generate_card_recto(self, my_image, my_text,index_current_card):
-        shift_x = (index_current_card%self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
-        #shift_y means a new line, we set 5 card by ine
-        shift_y = ceil((index_current_card%12)/self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+        shift_x = self.define_recto_shift_x(index_current_card)
+        shift_y = self.define_recto_shift_y(index_current_card)
 
         #set x and y
         self.pdf.set_xy(config.PAGE_MARGIN + shift_x,config.PAGE_MARGIN + shift_y)
@@ -90,18 +97,23 @@ class DrawCards:
             # file upload : https://pythonise.com/feed/flask/flask-uploading-files
             # Split the extension from the filename
             ext = image.filename.rsplit(".", 1)[1]
-            current_image_name = 'test-'+str(index_current_card)+'.'+ext
+            current_image_name = self.key+'-'+str(index_current_card)+'.'+ext
             image_storage_path = os.path.join(config.IMAGE_DIRECTORY, current_image_name)
             image.save(image_storage_path)
         else: #use default
             image_storage_path = config.DEFAULT_IMAGE_PATH
         return image_storage_path
 
+    def define_verso_shift_x(self,index_current_card):
+        return  (index_current_card%self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
+
+    def define_verso_shift_y(self,index_current_card):
+        # shift_y means a new line, we set 5 card by ine
+        return floor((index_current_card%12)/self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
 
     def generate_card_verso(self, index_current_card):
-        shift_x = (index_current_card%self.nb_cards_by_line) * (self.blank_between_cards + self.card_width)
-        #shift_y means a new line, we set 5 card by ine
-        shift_y = ceil((index_current_card%12)/self.nb_cards_by_line) * (self.blank_between_cards + self.card_height)
+        shift_x = self.define_verso_shift_x(index_current_card)
+        shift_y = self.define_verso_shift_y(index_current_card)
 
         #set x and y
         self.pdf.set_xy(config.PAGE_MARGIN + shift_x,config.PAGE_MARGIN + shift_y)

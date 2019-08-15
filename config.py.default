@@ -6,3 +6,4 @@ PAGE_MARGIN = 10
 RESULT_DIRECTORY = 'C:/Users/Jb Vercruysse/PycharmProjects/quiestcefl/results/'
 DRAW_CARD_VERSO = 'C:/Users/Jb Vercruysse/PycharmProjects/quiestcefl/static/draw-card-verso.png'
 TABLE_CARD_VERSO = 'C:/Users/Jb Vercruysse/PycharmProjects/quiestcefl/static/draw-card-verso.png'
+RESULT_WEB_ROOT = 'C:/Users/Jb Vercruysse/PycharmProjects/quiestcefl/results/'
